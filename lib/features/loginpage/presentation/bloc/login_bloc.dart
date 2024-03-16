@@ -17,33 +17,31 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(const SubmitMobileNumberScreenState());
     });
     
-    on<SubmitPhoneNumberEvent>((event, emit) {
+    on<SubmitPhoneNumberEvent>((event, emit) async{
       emit(const SubmitMobileNumberInitState());
       final  usecase = SubmitPhoneNumberUsecaseImpl(repository: repository);
-      usecase.execute(phoneNumber: event.phoneNumber)
-      .then((result){
-        result.fold((error) {
-          emit(SubmitMobileNumberFailureState(error: error));
+      final result = await usecase.execute(phoneNumber: event.phoneNumber);
+      
+      result.fold((error) {
+          emit(SubmitMobileNumberFailureState(error: error.props.first.toString()));
         }, (response) {
-          emit(SubmitMobileNumberSuccessState(data: response));
-          emit(const VerifyOTPScreenState());
-        });
-      });
+          emit(const SubmitMobileNumberSuccessState(data: 'success'));
+        }); 
     });
 
 
-    on<VerifyOTPEvent>((event, emit) {
+    on<VerifyOTPEvent>((event, emit) async{
       emit(const VerifyOTPInitState());
       final usecase = VerifyOTPUsecaseImpl(repository);
-      usecase.execute(otp: event.otp)
-      .then((result){
-        result.fold((error){
-          emit(VerifyOTPFailureState(error: error));
+      final result = await usecase.execute(otp: event.otp);
+      
+      result.fold((error){
+          emit(VerifyOTPFailureState(error: error.props.first.toString()));
         }, 
         (response) {
           emit(VerifyOTPSuccessState(data: response));
-        });
       });
     });
+
   }
 }

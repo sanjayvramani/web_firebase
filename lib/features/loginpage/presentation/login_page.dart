@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    _controller.showSubmitPhoneNumber();
   }
 
   @override
@@ -26,19 +27,24 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         padding: const EdgeInsets.all(16.0),
         child: BlocConsumer<LoginBloc,LoginState>(
-          buildWhen: (previous, current) => current is SubmitMobileNumberInitState || current is VerifyOTPInitState ,
+          listener: (context, state) {
+            if(state is SubmitMobileNumberFailureState)
+            {
+              print('Error');
+              print(state.error);
+            }
+          },
           builder: (context,state) {
-            if(state is SubmitMobileNumberScreenState) {
-              return SubmitPhoneNumberWidget(controller: _controller);
+            if(state is SubmitMobileNumberSuccessState) {
+              return VerifyOTPWidget(controller: _controller);
+            }
+            else if(state is SubmitMobileNumberFailureState) {
+              return Text(state.error);
             }
             
-            return VerifyOTPWidget(controller: _controller);
+            return SubmitPhoneNumberWidget(controller: _controller);
           }  ,
-        listenWhen: (previous, current) => current is SubmitMobileNumberFailureState || current is SubmitMobileNumberSuccessState ||
-        current is VerifyOTPFailureState || current is VerifyOTPSuccessState ,
-        listener: (context,state){
-
-        },),
+        ),
       ),
     );
   }

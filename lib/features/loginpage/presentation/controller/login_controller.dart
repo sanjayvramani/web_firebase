@@ -34,4 +34,9 @@ class LoginController implements ILoginController
     _navigatorService.navigatorKey.currentContext?.read<LoginBloc>().add(VerifyOTPEvent(otp: txtOTP.text));
   }
 
+  void showSubmitPhoneNumber()
+  {
+    _navigatorService.navigatorKey.currentContext?.read<LoginBloc>().add(SubmitPhoneNumberWidgetShowEvent());
+  }
+
 }
